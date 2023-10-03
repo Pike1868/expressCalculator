@@ -9,6 +9,7 @@ class calcOperations {
     return numsArr;
   }
 
+  // Should I create a new express error here and return to be handled in routes?
   isValidArray(nums) {
     if (nums.length === 0) {
       throw new ExpressError("No data provided", 400);

@@ -10,21 +10,52 @@ app.get("/", (req, res) => {
   res.sendFile(path.resolve("index.html"));
 });
 
-app.get("/operations/:operation", (req, res, next) => {
+app.get("/operations/mean", (req, res, next) => {
   try {
     const userQuery = req.query;
-    const userParam = req.params.operation;
-    // check if operation exists
-    if (co[userParam]) {
-      let result = co[`${userParam}`](userQuery);
-      res.json({ operation: userParam, value: result });
-    } else {
-      throw new ExpressError(`Operation '${userParam}' not supported`, 400);
-    }
+    let result = co.mean(userQuery);
+    res.json({ operation: "mean", value: result });
   } catch (error) {
     next(error);
   }
 });
+
+app.get("/operations/median", (req, res, next) => {
+  try {
+    const userQuery = req.query;
+    let result = co.median(userQuery);
+    res.json({ operation: "median", value: result });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/operations/mode", (req, res, next) => {
+  try {
+    const userQuery = req.query;
+    let result = co.mode(userQuery);
+    res.json({ operation: "mode", value: result });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// One route to handle all operations
+// app.get("/operations/:operation", (req, res, next) => {
+//   try {
+//     const userQuery = req.query;
+//     const userParam = req.params.operation;
+//     // check if operation exists
+//     if (co[userParam]) {
+//       let result = co[`${userParam}`](userQuery);
+//       res.json({ operation: userParam, value: result });
+//     } else {
+//       throw new ExpressError(`Operation '${userParam}' not supported`, 400);
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
 
 app.use((error, req, res, next) => {
   console.error("Error:", error);
