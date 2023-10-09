@@ -19,3 +19,17 @@ Handle the following errors:
 - Empty input: ***/mean*** without passing any nums should respond with a ***400 Bad Request*** status code saying something like ***nums are required.***
 
 Write unit tests for ***mean***, ***median*** and ***mode***.
+
+## **Further Study**
+
+- Make a route called ***/all*** that does all three operations at the same time, with the response from each of them as a key in the JSON response. It can look like this:
+
+
+```json
+response: {
+  operation: "all",
+  mean: 12
+  median: 10,
+  mode: 8
+}
+```

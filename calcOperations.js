@@ -1,78 +1,86 @@
 const ExpressError = require("./expressError");
 
-class calcOperations {
-  parseQueryValue(query) {
-    let numsArr = query["nums"]
-      .split(",")
-      .filter((n) => n !== "")
-      .map(Number);
-    return numsArr;
+function parseNumsFromQuery(query) {
+  if (query["nums"] === "") {
+    throw new ExpressError("No data provided", 400);
   }
+  //takes query string and converts to an array of numbers
+  let parsedNumsArr = query["nums"]
+    .split(",")
+    .filter((char) => char !== "")
+    .map(Number);
 
-  // Should I create a new express error here and return to be handled in routes?
-  isValidArray(nums) {
-    if (nums.length === 0) {
-      throw new ExpressError("No data provided", 400);
-    }
+  return parsedNumsArr;
+}
 
-    for (let num of nums) {
-      if (typeof num !== "number" || isNaN(num)) {
-        throw new ExpressError("All elements must be a number", 400);
-      }
-    }
-    return true;
-  }
-
-  mean(query) {
-    let nums = this.parseQueryValue(query);
-    this.isValidArray(nums);
-
-    let sum = nums.reduce((acc, curr) => acc + curr, 0);
-    return sum / nums.length;
-  }
-
-  median(query) {
-    let nums = this.parseQueryValue(query);
-    this.isValidArray(nums);
-
-    const len = nums.length;
-
-    nums.sort((a, b) => a - b);
-
-    if (len % 2 === 1) {
-      return nums[Math.floor(len / 2)];
-    } else {
-      const firstMedianElement = nums[len / 2 - 1];
-      const secondMedianElement = nums[len / 2];
-
-      return (firstMedianElement + secondMedianElement) / 2;
+function validateNumsInArr(numsArr) {
+  for (let num of numsArr) {
+    if (typeof num !== "number" || isNaN(num)) {
+      throw new ExpressError("All elements of query must be a number", 400);
     }
   }
 
-  mode(query) {
-    let nums = this.parseQueryValue(query);
-    this.isValidArray(nums);
+  console.log("All elements in arr have been validated");
+  return true;
+}
 
-    let numCount = {};
+function mean(arr) {
+  let sum = arr.reduce((acc, curr) => acc + curr, 0);
+  return sum / arr.length;
+}
 
-    for (let num of nums) {
-      if (numCount[num]) {
-        numCount[num]++;
-      } else {
-        numCount[num] = 1;
-      }
-    }
+function median(arr) {
+  const len = arr.length;
+  arr.sort((a, b) => a - b);
+  if (len % 2 === 1) {
+    return arr[Math.floor(len / 2)];
+  } else {
+    const firstMedianElement = arr[len / 2 - 1];
+    const secondMedianElement = arr[len / 2];
 
-    let maxCount = Math.max(...Object.values(numCount));
-
-    let modes = [];
-    for (let num in numCount) {
-      if (numCount[num] === maxCount) {
-        modes.push(Number(num));
-      }
-    }
-    return modes.length === 1 ? modes[0] : modes;
+    return (firstMedianElement + secondMedianElement) / 2;
   }
 }
 
-module.exports = calcOperations;
+function mode(arr) {
+  let numCount = {};
+
+  for (let num of arr) {
+    if (numCount[num]) {
+      numCount[num]++;
+    } else {
+      numCount[num] = 1;
+    }
+  }
+
+  let maxCount = Math.max(...Object.values(numCount));
+  let modes = [];
+  for (let num in numCount) {
+    if (numCount[num] === maxCount) {
+      modes.push(Number(num));
+    }
+  }
+  return modes.length === 1 ? modes[0] : modes;
+}
+
+function all(arr) {
+  let meanResult = mean(arr);
+  let medianResult = median(arr);
+  let modeResult = mode(arr);
+
+  return {
+    operation: "all",
+    mean: meanResult,
+    median: medianResult,
+    mode: modeResult,
+  };
+}
+
+module.exports = {
+  parseNumsFromQuery,
+  validateNumsInArr,
+  mean,
+  median,
+  mode,
+  all,
+};
